@@ -10,7 +10,8 @@
     "typecheck": "pnpm -r typecheck",
     "dev:mock": "pnpm --filter @choppilot/chopeazy-mock dev",
     "dev:agent": "pnpm --filter @choppilot/agent dev",
-    "dev:web": "pnpm --filter @choppilot/web dev"
+    "dev:web": "pnpm --filter @choppilot/web dev",
+    "test": "pnpm -r --if-present test"
   },
   "devDependencies": {
     "typescript": "^5.9.3"
