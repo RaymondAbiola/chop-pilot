@@ -1,0 +1,28 @@
+{
+  "name": "@choppilot/agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "address": "tsx src/scripts/address.ts",
+    "fund": "tsx src/scripts/address.ts --faucet",
+    "pay": "tsx src/scripts/pay-once.ts"
+  },
+  "dependencies": {
+    "@choppilot/shared": "workspace:*",
+    "@coinbase/cdp-sdk": "1.56.0",
+    "@x402/core": "2.26.0",
+    "@x402/evm": "2.26.0",
+    "@x402/extensions": "2.26.0",
+    "@x402/fetch": "2.26.0",
+    "@x402/svm": "2.26.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.5.2",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3"
+  }
+}

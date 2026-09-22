@@ -15,3 +15,12 @@ export const PACKS = {
 export type PackName = keyof typeof PACKS;
 
 export const PACK_NAMES = Object.keys(PACKS) as PackName[];
+
+// Circle's USDC on Base Sepolia. This is the asset the x402 exact scheme moves.
+export const USDC_BASE_SEPOLIA = "0x036CbD53842c5426634e7929541eC2318f3dCF7e";
+
+export const USDC_DECIMALS = 6;
+
+export function usdcToAtomic(usdc: number): bigint {
+  return BigInt(Math.round(usdc * 10 ** USDC_DECIMALS));
+}
