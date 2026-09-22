@@ -70,6 +70,21 @@ async function main(): Promise<void> {
   await checkGuardrail();
 }
 
+// The client wraps a blocked payment in a generic Error, so the SpendControlError
+// arrives as a cause rather than the thrown value. Walk the chain before giving up.
+function findSpendControlError(err: unknown): SpendControlError | null {
+  let current: unknown = err;
+  for (let depth = 0; depth < 5; depth++) {
+    if (current instanceof SpendControlError) return current;
+    if (current instanceof Error && current.cause !== undefined) {
+      current = current.cause;
+      continue;
+    }
+    return null;
+  }
+  return null;
+}
+
 // The demo claims the code refuses what the LLM proposes. Prove the SDK layer
 // actually refuses, rather than trusting the configuration.
 async function checkGuardrail(): Promise<void> {
@@ -79,10 +94,19 @@ async function checkGuardrail(): Promise<void> {
     console.error(`  NOT BLOCKED. status ${result.status}. Spend controls are not working.`);
     process.exitCode = 1;
   } catch (err) {
-    if (err instanceof SpendControlError) {
-      console.log(`  blocked as expected: ${err.code}`);
+    const spendError = findSpendControlError(err);
+    const message = err instanceof Error ? err.message : String(err);
+
+    if (spendError) {
+      console.log(`  blocked as expected: ${spendError.code}`);
+    } else if (/per-payment cap|cumulative cap|not allowed/i.test(message)) {
+      // Blocked for the right reason, but the cause chain did not carry the
+      // typed error. Good enough to pass; worth knowing it is message-matched.
+      console.log("  blocked as expected (matched on message, not typed error)");
+      console.log(`    ${message}`);
     } else {
-      console.log(`  blocked, but not by a SpendControlError: ${String(err)}`);
+      console.error(`  blocked for an unexpected reason: ${message}`);
+      process.exitCode = 1;
     }
   }
   console.log("");
