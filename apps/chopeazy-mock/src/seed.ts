@@ -1,0 +1,38 @@
+import { openDb, type DB } from "./db.js";
+
+const DEMO_ACCOUNT = { id: "amaka", name: "Amaka", startingChops: 12 };
+
+// Two or three meals a day with mild variance. This is the baseline the agent
+// reasons against, so a spike in the demo has something to look abnormal next to.
+const DAILY_PATTERN = [3, 2, 3, 2, 2, 3, 3, 2, 3, 2, 2, 3, 2, 3];
+
+export function seed(db: DB): void {
+  const existing = db.prepare("SELECT COUNT(*) AS n FROM accounts").get() as { n: number };
+  if (existing.n > 0) return;
+
+  db.prepare("INSERT INTO accounts (id, name, chop_balance) VALUES (?, ?, ?)").run(
+    DEMO_ACCOUNT.id,
+    DEMO_ACCOUNT.name,
+    DEMO_ACCOUNT.startingChops,
+  );
+
+  const insert = db.prepare("INSERT INTO orders (account_id, chops, created_at) VALUES (?, ?, ?)");
+  const now = Date.now();
+
+  DAILY_PATTERN.forEach((meals, i) => {
+    const daysAgo = DAILY_PATTERN.length - i;
+    for (let meal = 0; meal < meals; meal++) {
+      // Spread meals across the day so the sparkline is not a flat stack.
+      const at = new Date(now - daysAgo * 86_400_000 + (8 + meal * 5) * 3_600_000);
+      insert.run(DEMO_ACCOUNT.id, 1, at.toISOString());
+    }
+  });
+}
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  const db = openDb(process.env.DB_PATH ?? "chopeazy.sqlite");
+  seed(db);
+  const account = db.prepare("SELECT * FROM accounts").all();
+  const orders = db.prepare("SELECT COUNT(*) AS n FROM orders").get() as { n: number };
+  console.log("seeded:", account, `${orders.n} orders`);
+}
