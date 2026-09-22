@@ -40,11 +40,21 @@ export const orderSchema = z.object({
   created_at: z.string(),
 });
 
+export const rechargeRecordSchema = z.object({
+  id: z.number(),
+  account_id: z.string(),
+  pack: z.string(),
+  usdc: z.number(),
+  tx_hash: z.string().nullable(),
+  created_at: z.string(),
+});
+
 export const accountStateSchema = z.object({
   id: z.string(),
   name: z.string(),
   chop_balance: z.number(),
   orders: z.array(orderSchema),
+  recharges: z.array(rechargeRecordSchema).optional(),
 });
 
 export type AccountState = z.infer<typeof accountStateSchema>;

@@ -17,6 +17,16 @@ export const config = {
   },
 } as const;
 
+// Starting rules. The dashboard will let the payer change these in commit 12;
+// until then they are the demo defaults.
+export const defaultRules = {
+  weeklyCapUsdc: Number(process.env.RULE_WEEKLY_CAP_USDC ?? 3),
+  maxPerRechargeUsdc: Number(process.env.RULE_MAX_PER_RECHARGE_USDC ?? 0.5),
+  minBalanceTrigger: Number(process.env.RULE_MIN_BALANCE_TRIGGER ?? 10),
+  cooldownMinutes: Number(process.env.RULE_COOLDOWN_MINUTES ?? 60),
+  recipientAllowlist: [requireEnv("MERCHANT_ADDRESS")],
+};
+
 export const spendAtomic = {
   perPayment: usdcToAtomic(config.spend.maxPerPaymentUsdc),
   cumulative: usdcToAtomic(config.spend.maxCumulativeUsdc),
