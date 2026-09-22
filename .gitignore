@@ -4,6 +4,5 @@ dist/
 *.tsbuildinfo
 .env
 .env.local
-*.sqlite
-*.sqlite-journal
+*.sqlite*
 .DS_Store

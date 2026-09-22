@@ -1,8 +1,19 @@
 import express from "express";
 import cors from "cors";
-import { PACKS } from "@choppilot/shared";
-import { getAccount, listAccounts, listRecharges, openDb, ordersSince, placeOrder } from "./db.js";
+import { paymentMiddleware } from "@x402/express";
+import { PACK_NAMES, PACKS, type PackName } from "@choppilot/shared";
+import {
+  creditChops,
+  getAccount,
+  listAccounts,
+  listRecharges,
+  openDb,
+  ordersSince,
+  placeOrder,
+  recordRecharge,
+} from "./db.js";
 import { seed } from "./seed.js";
+import { buildResourceServer, buildRoutes, FACILITATOR } from "./x402.js";
 
 // Node loads .env natively; no dotenv dependency needed.
 try {
@@ -17,9 +28,17 @@ const HISTORY_DAYS = 14;
 const db = openDb(process.env.DB_PATH ?? "chopeazy.sqlite");
 seed(db);
 
+const MERCHANT = process.env.MERCHANT_ADDRESS;
+if (!MERCHANT) {
+  throw new Error("MERCHANT_ADDRESS is required; it is the address that receives recharge payments");
+}
+
+const FACILITATOR_OVERRIDE = process.env.FACILITATOR_URL ?? FACILITATOR;
+
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(paymentMiddleware(buildRoutes(MERCHANT), buildResourceServer(FACILITATOR_OVERRIDE)));
 
 app.get("/health", (_req, res) => {
   res.json({ ok: true, packs: PACKS });
@@ -64,6 +83,39 @@ app.post("/orders", (req, res) => {
   res.status(201).json({ order, chop_balance: updated?.chop_balance ?? 0 });
 });
 
+// Paywalled. The middleware has already verified payment by the time this runs;
+// settlement happens after the response, and the tx hash reaches the payer in
+// the X-PAYMENT-RESPONSE header.
+for (const pack of PACK_NAMES) {
+  app.post(`/recharge/${pack}`, (req, res) => {
+    const accountId = typeof req.body?.account_id === "string" ? req.body.account_id : undefined;
+    if (!accountId) {
+      res.status(400).json({ error: "account_id is required" });
+      return;
+    }
+
+    const account = getAccount(db, accountId);
+    if (!account) {
+      res.status(404).json({ error: "account not found" });
+      return;
+    }
+
+    const { chops, usdc } = PACKS[pack as PackName];
+    creditChops(db, accountId, chops);
+    const recharge = recordRecharge(db, accountId, pack, usdc, null);
+    const updated = getAccount(db, accountId);
+
+    res.json({
+      recharge,
+      chops_credited: chops,
+      chop_balance: updated?.chop_balance ?? 0,
+    });
+  });
+}
+
 app.listen(PORT, () => {
   console.log(`chopeazy-mock listening on http://localhost:${PORT}`);
+  console.log(`  paywalled packs: ${PACK_NAMES.join(", ")}`);
+  console.log(`  merchant: ${MERCHANT}`);
+  console.log(`  facilitator: ${FACILITATOR_OVERRIDE}`);
 });

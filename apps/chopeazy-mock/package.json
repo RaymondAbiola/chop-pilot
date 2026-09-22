@@ -12,6 +12,9 @@
   },
   "dependencies": {
     "@choppilot/shared": "workspace:*",
+    "@x402/core": "^2.26.0",
+    "@x402/evm": "^2.26.0",
+    "@x402/express": "^2.26.0",
     "better-sqlite3": "^13.0.3",
     "cors": "^2.8.6",
     "express": "^5.2.1"
