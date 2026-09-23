@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { FlagInbox } from "./components/FlagInbox";
 import { RulesForm } from "./components/RulesForm";
 import { StatStrip } from "./components/StatStrip";
 import { Timeline } from "./components/Timeline";
@@ -26,6 +27,8 @@ export default function Dashboard() {
       </header>
 
       <StatStrip account={account} />
+
+      <FlagInbox />
 
       <div className={styles.columns}>
         <div className={styles.column}>

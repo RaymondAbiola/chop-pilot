@@ -1,0 +1,97 @@
+.inbox {
+  border: 1px solid var(--amber);
+  border-left-width: 2px;
+  background: var(--surface);
+  padding: 16px 18px 18px;
+  margin: 24px 0;
+}
+
+.headline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.count {
+  color: var(--amber);
+  font-size: 12px;
+}
+
+.item {
+  padding-top: 12px;
+}
+
+.item + .item {
+  margin-top: 14px;
+  border-top: 1px solid var(--hairline);
+  padding-top: 14px;
+}
+
+.reasoning {
+  font-size: 13.5px;
+  line-height: 1.55;
+  margin: 0;
+  max-width: 62ch;
+}
+
+.meta {
+  color: var(--dim);
+  font-size: 11px;
+  margin: 6px 0 0;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.approve,
+.reject {
+  background: transparent;
+  border: 1px solid var(--hairline-strong);
+  color: var(--text);
+  padding: 7px 12px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
+}
+
+.approve:hover:not(:disabled) {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.reject:hover:not(:disabled) {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.price {
+  color: var(--dim);
+  font-size: 10px;
+}
+
+.approve:hover:not(:disabled) .price {
+  color: inherit;
+}
+
+.error {
+  color: var(--red);
+  font-family: var(--mono);
+  font-size: 11px;
+  margin: 12px 0 0;
+}
+
+.note {
+  color: var(--dim);
+  font-size: 10.5px;
+  line-height: 1.5;
+  margin: 14px 0 0;
+  max-width: 68ch;
+}
