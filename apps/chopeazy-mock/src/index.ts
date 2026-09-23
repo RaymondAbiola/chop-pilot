@@ -5,6 +5,7 @@ import { PACK_NAMES, PACKS, type PackName } from "@choppilot/shared";
 import {
   creditChops,
   getAccount,
+  truncateAll,
   listAccounts,
   listRecharges,
   openDb,
@@ -62,6 +63,31 @@ app.get("/accounts/:id", (req, res) => {
     orders: ordersSince(db, account.id, since),
     recharges: listRecharges(db, account.id),
   });
+});
+
+// Demo control. Resets to the seeded 14 day history and starting balance
+// without restarting the server.
+app.post("/demo/reset", (_req, res) => {
+  truncateAll(db);
+  seed(db);
+  res.json(listAccounts(db));
+});
+
+// Adds consumption dated today. `spike` multiplies the normal daily rate so the
+// demo can produce an anomaly on demand.
+app.post("/demo/consume", (req, res) => {
+  const accountId = typeof req.body?.account_id === "string" ? req.body.account_id : "amaka";
+  const chops = Number.isInteger(req.body?.chops) ? (req.body.chops as number) : 3;
+
+  const account = getAccount(db, accountId);
+  if (!account) {
+    res.status(404).json({ error: "account not found" });
+    return;
+  }
+
+  placeOrder(db, accountId, chops);
+  const updated = getAccount(db, accountId);
+  res.json({ chops, chop_balance: updated?.chop_balance ?? 0 });
 });
 
 app.post("/orders", (req, res) => {

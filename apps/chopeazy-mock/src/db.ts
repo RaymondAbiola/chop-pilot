@@ -61,6 +61,15 @@ function migrate(db: DB): void {
   `);
 }
 
+// Wipes every table so the seed can run again. Used by the demo reset, which
+// has to work without stopping the server or deleting the file underneath it.
+export function truncateAll(db: DB): void {
+  db.transaction(() => {
+    db.exec("DELETE FROM recharges; DELETE FROM orders; DELETE FROM accounts;");
+    db.exec("DELETE FROM sqlite_sequence WHERE name IN ('orders','recharges');");
+  })();
+}
+
 export function getAccount(db: DB, id: string): AccountRow | undefined {
   return db.prepare("SELECT * FROM accounts WHERE id = ?").get(id) as AccountRow | undefined;
 }
