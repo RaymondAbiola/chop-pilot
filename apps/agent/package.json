@@ -23,12 +23,16 @@
     "@x402/fetch": "2.26.0",
     "@x402/svm": "2.26.0",
     "better-sqlite3": "^13.0.3",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
     "openai": "7.20.0",
     "zod": "3.25.76",
     "zod-to-json-schema": "3.25.2"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^9.6.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
     "@types/node": "^24.5.2",
     "tsx": "^4.23.15",
     "typescript": "^5.9.3",
