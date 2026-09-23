@@ -65,7 +65,15 @@ export const decisionSchema = z.object({
   account: accountStateSchema.pick({ id: true, chop_balance: true }),
   proposal: proposalSchema,
   verdict: policyVerdictSchema,
-  status: z.enum(["paid", "blocked", "flagged", "waited", "approved_by_payer", "rejected_by_payer"]),
+  status: z.enum([
+    "paid",
+    "blocked",
+    "flagged",
+    "waited",
+    "failed",
+    "approved_by_payer",
+    "rejected_by_payer",
+  ]),
   tx_hash: z.string().nullable(),
 });
 

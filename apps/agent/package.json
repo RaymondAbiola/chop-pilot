@@ -11,7 +11,8 @@
     "fund": "tsx src/scripts/address.ts --faucet",
     "pay": "tsx src/scripts/pay-once.ts",
     "propose": "tsx src/scripts/propose-once.ts",
-    "test": "vitest run"
+    "test": "vitest run",
+    "tick": "tsx src/scripts/tick-once.ts"
   },
   "dependencies": {
     "@choppilot/shared": "workspace:*",
@@ -21,11 +22,13 @@
     "@x402/extensions": "2.26.0",
     "@x402/fetch": "2.26.0",
     "@x402/svm": "2.26.0",
+    "better-sqlite3": "^13.0.3",
     "openai": "7.20.0",
     "zod": "3.25.76",
     "zod-to-json-schema": "3.25.2"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^9.6.0",
     "@types/node": "^24.5.2",
     "tsx": "^4.23.15",
     "typescript": "^5.9.3",
