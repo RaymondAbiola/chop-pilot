@@ -3,7 +3,8 @@ import { config } from "./config.js";
 import { payForPack } from "./pay.js";
 import { evaluate } from "./policy.js";
 import { proposeDecision } from "./serv.js";
-import { getRules, recordDecision, type Store } from "./store.js";
+import { summarizeUsage } from "./usage.js";
+import { getDecision, getRules, recordDecision, updateDecision, type Store } from "./store.js";
 import type { CdpX402Client } from "@coinbase/cdp-sdk/x402";
 
 export interface TickResult {
@@ -12,7 +13,7 @@ export interface TickResult {
   model: string;
 }
 
-async function fetchAccount(accountId: string) {
+export async function fetchAccount(accountId: string) {
   const res = await fetch(`${config.mockUrl}/accounts/${accountId}`);
   if (!res.ok) {
     throw new Error(`chopeazy-mock returned ${res.status} for account ${accountId}`);
@@ -84,4 +85,66 @@ export async function runTick(
     });
     return { decision, tokens, model };
   }
+}
+
+export interface ResolveResult {
+  decision: Decision;
+  blockedBy?: string[];
+}
+
+// The payer reviewed a flagged decision. Approving waives the anomaly
+// judgement and nothing else: the caps, the allowlist and the cooldown are
+// re-checked against the account as it stands now, not as it stood when the
+// flag was raised.
+export async function approveFlagged(
+  db: Store,
+  client: CdpX402Client,
+  id: string,
+  pack: PackName,
+): Promise<ResolveResult> {
+  const existing = getDecision(db, id);
+  if (!existing) throw new Error("decision not found");
+  if (existing.status !== "flagged") {
+    throw new Error(`decision is ${existing.status}, not flagged`);
+  }
+
+  const account = await fetchAccount(existing.account.id);
+  const rules = getRules(db);
+  const usage = summarizeUsage(account.orders);
+
+  const proposal = { ...existing.proposal, action: "recharge" as const, pack };
+  const verdict = evaluate(
+    proposal,
+    {
+      balance: account.chop_balance,
+      usage,
+      recharges: account.recharges ?? [],
+      rules,
+      payee: config.merchantAddress,
+    },
+    { waiveAnomaly: true },
+  );
+
+  if (!verdict.approved) {
+    return { decision: existing, blockedBy: verdict.blockedBy };
+  }
+
+  const result = await payForPack(client, pack, account.id);
+  if (!result.ok) {
+    updateDecision(db, id, "failed", null);
+    return { decision: { ...existing, status: "failed" }, blockedBy: [`payment_failed:${result.status}`] };
+  }
+
+  updateDecision(db, id, "approved_by_payer", result.txHash);
+  return { decision: { ...existing, status: "approved_by_payer", tx_hash: result.txHash } };
+}
+
+export function rejectFlagged(db: Store, id: string): Decision {
+  const existing = getDecision(db, id);
+  if (!existing) throw new Error("decision not found");
+  if (existing.status !== "flagged") {
+    throw new Error(`decision is ${existing.status}, not flagged`);
+  }
+  updateDecision(db, id, "rejected_by_payer", null);
+  return { ...existing, status: "rejected_by_payer" };
 }

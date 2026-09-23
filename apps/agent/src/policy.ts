@@ -52,9 +52,20 @@ export function minutesSinceLastRecharge(recharges: PastRecharge[], now: Date): 
   return (now.getTime() - new Date(latest.created_at).getTime()) / 60_000;
 }
 
+export interface EvaluateOptions {
+  // Set when the payer has reviewed a flagged decision and accepted it. It
+  // waives the anomaly judgement only. The hard money limits still apply,
+  // because approving an unusual week is not the same as raising your cap.
+  waiveAnomaly?: boolean;
+}
+
 // Every failing rule is reported, not just the first, so the payer sees the
 // whole reason a payment was refused.
-export function evaluate(proposal: Proposal, ctx: PolicyContext): PolicyVerdict {
+export function evaluate(
+  proposal: Proposal,
+  ctx: PolicyContext,
+  options: EvaluateOptions = {},
+): PolicyVerdict {
   if (proposal.action !== "recharge") {
     return { approved: false, blockedBy: [] };
   }
@@ -86,7 +97,7 @@ export function evaluate(proposal: Proposal, ctx: PolicyContext): PolicyVerdict 
   }
 
   // The model's own anomaly flag counts too: it may spot something the ratio misses.
-  if (ctx.usage.spikeRatio > ANOMALY_THRESHOLD || proposal.anomaly) {
+  if (!options.waiveAnomaly && (ctx.usage.spikeRatio > ANOMALY_THRESHOLD || proposal.anomaly)) {
     blockedBy.push(BlockReason.ANOMALY);
   }
 

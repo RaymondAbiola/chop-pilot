@@ -167,3 +167,37 @@ describe("spentInWindow", () => {
     expect(spentInWindow([], NOW)).toBe(0);
   });
 });
+
+describe("waiveAnomaly", () => {
+  it("lets a payer-approved anomaly through", () => {
+    const verdict = evaluate(
+      recharge({ anomaly: true }),
+      ctx({ usage: usage(ANOMALY_THRESHOLD + 2) }),
+      { waiveAnomaly: true },
+    );
+    expect(verdict.approved).toBe(true);
+  });
+
+  it("still enforces the weekly cap for an approved anomaly", () => {
+    const verdict = evaluate(
+      recharge({ anomaly: true }),
+      ctx({
+        usage: usage(ANOMALY_THRESHOLD + 2),
+        recharges: [{ usdc: 2.9, created_at: daysAgo(1) }],
+      }),
+      { waiveAnomaly: true },
+    );
+    expect(verdict.approved).toBe(false);
+    expect(verdict.blockedBy).toContain(BlockReason.WEEKLY_CAP);
+    expect(verdict.blockedBy).not.toContain(BlockReason.ANOMALY);
+  });
+
+  it("still enforces the recipient allowlist for an approved anomaly", () => {
+    const verdict = evaluate(
+      recharge({ anomaly: true }),
+      ctx({ usage: usage(ANOMALY_THRESHOLD + 2), payee: "0xdeadbeef00000000000000000000000000000000" }),
+      { waiveAnomaly: true },
+    );
+    expect(verdict.blockedBy).toContain(BlockReason.RECIPIENT_NOT_ALLOWED);
+  });
+});

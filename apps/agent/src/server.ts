@@ -1,9 +1,9 @@
 import cors from "cors";
 import express, { type Express } from "express";
-import { rulesSchema } from "@choppilot/shared";
+import { PACK_NAMES, rulesSchema, type PackName } from "@choppilot/shared";
 import type { CdpX402Client } from "@coinbase/cdp-sdk/x402";
 import { config, defaultRules } from "./config.js";
-import { runTick } from "./loop.js";
+import { approveFlagged, rejectFlagged, runTick } from "./loop.js";
 import {
   getDecision,
   getRules,
@@ -77,6 +77,44 @@ export function createServer(): AgentServer {
       .catch((err: unknown) => {
         res.status(502).json({ error: err instanceof Error ? err.message : String(err) });
       });
+  });
+
+  // Approving costs money, so it takes the same single-flight lock as a tick.
+  app.post("/decisions/:id/approve", (req, res) => {
+    if (inFlight) {
+      res.status(409).json({ error: "a payment is already running" });
+      return;
+    }
+
+    const requested = req.body?.pack;
+    // Defaults to the cheapest pack. A flagged proposal usually carries no
+    // pack, and the safe default when spending someone else's money is least.
+    const pack: PackName = PACK_NAMES.includes(requested) ? requested : "small";
+
+    const run = approveFlagged(db, client, req.params.id, pack)
+      .then((result) => {
+        if (result.blockedBy) {
+          res.status(409).json({ error: "still blocked", blockedBy: result.blockedBy });
+          return;
+        }
+        res.json(result.decision);
+      })
+      .catch((err: unknown) => {
+        res.status(400).json({ error: err instanceof Error ? err.message : String(err) });
+      })
+      .finally(() => {
+        inFlight = null;
+      });
+
+    inFlight = run;
+  });
+
+  app.post("/decisions/:id/reject", (req, res) => {
+    try {
+      res.json(rejectFlagged(db, req.params.id));
+    } catch (err) {
+      res.status(400).json({ error: err instanceof Error ? err.message : String(err) });
+    }
   });
 
   app.post("/tick", (req, res) => {
