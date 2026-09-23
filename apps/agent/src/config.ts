@@ -1,4 +1,7 @@
-import { loadRootEnv, requireEnv, usdcToAtomic } from "@choppilot/shared";
+import {
+  usdcToAtomic,
+} from "@choppilot/shared";
+import { loadRootEnv, requireEnv } from "@choppilot/shared/env";
 
 loadRootEnv(import.meta.url);
 

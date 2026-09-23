@@ -1,0 +1,90 @@
+.panel {
+  padding: 20px 0 24px;
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.fieldLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12px;
+}
+
+.hint {
+  color: var(--dim);
+  font-size: 10.5px;
+}
+
+.inputWrap {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+}
+
+.input {
+  width: 74px;
+  background: var(--surface);
+  border: 1px solid var(--hairline-strong);
+  color: var(--text);
+  padding: 6px 9px;
+  font-size: 13px;
+  text-align: right;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--amber);
+}
+
+.unit {
+  color: var(--dim);
+  font-size: 10px;
+  font-family: var(--mono);
+  width: 32px;
+}
+
+.allowlist {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 11px 0;
+}
+
+.locked {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.button {
+  background: transparent;
+  border: 1px solid var(--hairline-strong);
+  color: var(--text);
+  padding: 8px 16px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-top: 18px;
+}
+
+.button:hover:not(:disabled) {
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+.error {
+  color: var(--red);
+  font-size: 11px;
+  font-family: var(--mono);
+  margin: 10px 0 0;
+}

@@ -5,8 +5,8 @@ import {
   type Rules,
   PACKS,
   proposalSchema,
-  requireEnv,
 } from "@choppilot/shared";
+import { requireEnv } from "@choppilot/shared/env";
 import { toStrictJsonSchema } from "./schema-json.js";
 import { projectDaysLeft, summarizeUsage, type UsageSummary } from "./usage.js";
 

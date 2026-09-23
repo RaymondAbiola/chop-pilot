@@ -1,0 +1,53 @@
+.strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+}
+
+.stat {
+  background: var(--ink);
+  padding: 18px 0 20px;
+}
+
+.stat:not(:first-child) {
+  padding-left: 20px;
+}
+
+.value {
+  font-size: 30px;
+  line-height: 1.1;
+  margin-top: 6px;
+}
+
+.unit {
+  color: var(--dim);
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+.meter {
+  height: 2px;
+  background: var(--hairline-strong);
+  margin-top: 10px;
+  max-width: 160px;
+}
+
+.meter span {
+  display: block;
+  height: 100%;
+}
+
+@media (max-width: 640px) {
+  .strip {
+    grid-template-columns: 1fr 1fr;
+  }
+  .stat:nth-child(3) {
+    grid-column: 1 / -1;
+    padding-left: 0;
+  }
+  .value {
+    font-size: 24px;
+  }
+}

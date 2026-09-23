@@ -10,6 +10,7 @@
   align-items: center;
   justify-content: space-between;
   height: 56px;
+  border-bottom: 1px solid var(--hairline);
 }
 
 .wordmark {
@@ -35,12 +36,39 @@
   border-radius: 50%;
 }
 
-.body {
-  padding: 48px 0;
+.columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--hairline);
+}
+
+.column {
+  background: var(--ink);
+  padding-right: 24px;
+}
+
+.column + .column {
+  padding-left: 24px;
+  padding-right: 0;
 }
 
 .placeholder {
   color: var(--dim);
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 11px;
+  padding: 24px 0;
+}
+
+@media (max-width: 760px) {
+  .columns {
+    grid-template-columns: 1fr;
+  }
+  .column {
+    padding: 0;
+  }
+  .column + .column {
+    padding-left: 0;
+    border-top: 1px solid var(--hairline);
+  }
 }
