@@ -5,6 +5,7 @@ import { DemoPanel } from "./components/DemoPanel";
 import { FlagInbox } from "./components/FlagInbox";
 import { RulesForm } from "./components/RulesForm";
 import { StatStrip } from "./components/StatStrip";
+import { UsageChart } from "./components/UsageChart";
 import { Timeline } from "./components/Timeline";
 import { WalletCard } from "./components/WalletCard";
 import { api } from "@/lib/api";
@@ -28,6 +29,8 @@ export default function Dashboard() {
       </header>
 
       <StatStrip account={account} />
+
+      <UsageChart account={account} />
 
       <FlagInbox />
 

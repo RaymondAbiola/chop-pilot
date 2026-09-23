@@ -7,12 +7,14 @@ import { baseSepolia } from "wagmi/chains";
 import { useAccount, useConnect, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { USDC_BASE_SEPOLIA, USDC_DECIMALS } from "@choppilot/shared";
 import { api } from "@/lib/api";
+import { useQuery as useRulesQuery } from "@tanstack/react-query";
 import styles from "./WalletCard.module.css";
 
 const EXPLORER = "https://sepolia.basescan.org";
 
 export function WalletCard() {
   const wallet = useQuery({ queryKey: ["wallet"], queryFn: api.wallet, refetchInterval: 15_000 });
+  const rules = useRulesQuery({ queryKey: ["rules"], queryFn: api.rules });
   const { isConnected } = useAccount();
   const { connect, connectors } = useConnect();
   const [amount, setAmount] = useState("5");
@@ -51,14 +53,17 @@ export function WalletCard() {
 
       <hr className="rule" />
 
-      <div className="label" style={{ marginTop: 16 }}>sdk spend controls</div>
+      <div className="label" style={{ marginTop: 16 }}>wallet backstop</div>
       <Row label="per payment" value={wallet.data ? `$${wallet.data.spendControls.maxPerPaymentUsdc.toFixed(2)}` : undefined} />
       <Row
         label="cumulative"
         value={wallet.data ? `$${wallet.data.spendControls.maxCumulativeUsdc.toFixed(2)} / ${wallet.data.spendControls.window}` : undefined}
       />
       <p className={styles.note}>
-        Enforced by the CDP SDK beneath the policy engine. They hold even if the agent process is wrong.
+        A second limit inside the wallet itself, set higher than your own
+        {rules.data ? ` $${rules.data.weeklyCapUsdc.toFixed(2)} weekly cap` : " weekly cap"} and not
+        changeable from this screen. Your rules stop the agent first. This stops it even if the
+        agent&apos;s own code is wrong.
       </p>
 
       <hr className="rule" />

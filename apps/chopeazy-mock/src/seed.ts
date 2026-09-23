@@ -1,3 +1,4 @@
+import { CHOP_PRICE_USDC } from "@choppilot/shared";
 import { openDb, type DB } from "./db.js";
 
 const DEMO_ACCOUNT = { id: "amaka", name: "Amaka", startingChops: 12 };
@@ -5,6 +6,11 @@ const DEMO_ACCOUNT = { id: "amaka", name: "Amaka", startingChops: 12 };
 // Two or three meals a day with mild variance. This is the baseline the agent
 // reasons against, so a spike in the demo has something to look abnormal next to.
 const DAILY_PATTERN = [3, 2, 3, 2, 2, 3, 3, 2, 3, 2, 2, 3, 2, 3];
+
+// Before ChopPilot existed the payer topped the account up by hand. Without
+// this record the seeded balance and the seeded eating history do not add up,
+// and the account looks like it was funded from nowhere.
+const MANUAL_TOP_UP_DAYS_AGO = 14;
 
 export function seed(db: DB): void {
   const existing = db.prepare("SELECT COUNT(*) AS n FROM accounts").get() as { n: number };
@@ -18,6 +24,18 @@ export function seed(db: DB): void {
 
   const insert = db.prepare("INSERT INTO orders (account_id, chops, created_at) VALUES (?, ?, ?)");
   const now = Date.now();
+
+  const eaten = DAILY_PATTERN.reduce((sum, meals) => sum + meals, 0);
+  const loaded = eaten + DEMO_ACCOUNT.startingChops;
+  db.prepare(
+    "INSERT INTO recharges (account_id, pack, usdc, tx_hash, created_at) VALUES (?, ?, ?, ?, ?)",
+  ).run(
+    DEMO_ACCOUNT.id,
+    "manual",
+    Number((loaded * CHOP_PRICE_USDC).toFixed(2)),
+    null,
+    new Date(now - MANUAL_TOP_UP_DAYS_AGO * 86_400_000).toISOString(),
+  );
 
   DAILY_PATTERN.forEach((meals, i) => {
     const daysAgo = DAILY_PATTERN.length - i;

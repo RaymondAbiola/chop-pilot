@@ -1,0 +1,51 @@
+.wrap {
+  padding: 18px 0 20px;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.avg {
+  color: var(--dim);
+  font-size: 10.5px;
+}
+
+.svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+.foot {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 8px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--dim);
+}
+
+.callout {
+  text-align: center;
+  flex: 1;
+}
+
+.steady {
+  flex: 1;
+  text-align: center;
+}
+
+.backstory {
+  color: var(--dim);
+  font-family: var(--mono);
+  font-size: 10px;
+  margin: 10px 0 0;
+}
