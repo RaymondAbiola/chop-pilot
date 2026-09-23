@@ -54,4 +54,5 @@ export const api = {
       body: JSON.stringify({ chops }),
     }),
   reset: () => json<unknown>(`${MOCK}/demo/reset`, { method: "POST" }),
+  resetAgent: () => json<unknown>(`${AGENT}/demo/reset`, { method: "POST" }),
 };

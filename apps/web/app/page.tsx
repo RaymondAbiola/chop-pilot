@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { DemoPanel } from "./components/DemoPanel";
 import { FlagInbox } from "./components/FlagInbox";
 import { RulesForm } from "./components/RulesForm";
 import { StatStrip } from "./components/StatStrip";
@@ -38,6 +39,8 @@ export default function Dashboard() {
           <RulesForm />
         </div>
       </div>
+
+      <DemoPanel />
 
       <section className={styles.timeline}>
         <div className="label">decisions</div>

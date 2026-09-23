@@ -111,6 +111,12 @@ export function getDecision(db: Store, id: string): Decision | undefined {
   return row ? hydrate(row) : undefined;
 }
 
+// Demo control. Clears the decision log but leaves the payer's rules alone,
+// since those are configuration rather than history.
+export function clearDecisions(db: Store): void {
+  db.prepare("DELETE FROM decisions").run();
+}
+
 export function listFlagged(db: Store): Decision[] {
   const rows = db
     .prepare("SELECT * FROM decisions WHERE status = 'flagged' ORDER BY created_at DESC")

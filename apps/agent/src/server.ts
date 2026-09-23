@@ -5,6 +5,7 @@ import type { CdpX402Client } from "@coinbase/cdp-sdk/x402";
 import { config, defaultRules } from "./config.js";
 import { approveFlagged, rejectFlagged, runTick } from "./loop.js";
 import {
+  clearDecisions,
   getDecision,
   getRules,
   listDecisions,
@@ -58,6 +59,11 @@ export function createServer(): AgentServer {
 
   app.get("/flags", (_req, res) => {
     res.json(listFlagged(db));
+  });
+
+  app.post("/demo/reset", (_req, res) => {
+    clearDecisions(db);
+    res.json({ ok: true });
   });
 
   app.get("/rules", (_req, res) => {
