@@ -6,3 +6,5 @@ dist/
 .env.local
 *.sqlite*
 .DS_Store
+apps/web/AGENTS.md
+apps/web/CLAUDE.md

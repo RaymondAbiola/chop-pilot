@@ -1,0 +1,82 @@
+/*
+ * Treasury terminal. Dark only, on purpose: this is a money console, and a
+ * light variant would halve the contrast the numbers rely on.
+ */
+:root {
+  --ink: #0c0d0e;
+  --surface: #141517;
+  --hairline: #23252a;
+  --hairline-strong: #33363d;
+
+  --text: #e8e6e3;
+  --muted: #8a8f98;
+  --dim: #5d626b;
+
+  --amber: #e8a33d;
+  --green: #6fcf97;
+  --red: #e5484d;
+  --blue: #6ba5e8;
+
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --gutter: 16px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--ink);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Numbers are the point. Tabular figures so columns do not jitter on update. */
+.num {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.rule {
+  border: 0;
+  border-top: 1px solid var(--hairline);
+  margin: 0;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+@media (max-width: 640px) {
+  :root {
+    --gutter: 14px;
+  }
+}
