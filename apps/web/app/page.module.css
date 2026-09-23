@@ -72,3 +72,13 @@
     border-top: 1px solid var(--hairline);
   }
 }
+
+.timeline {
+  border-top: 1px solid var(--hairline);
+  padding-top: 20px;
+  padding-bottom: 64px;
+}
+
+.timeline > .label {
+  margin-bottom: 8px;
+}

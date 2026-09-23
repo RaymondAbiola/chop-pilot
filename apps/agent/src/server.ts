@@ -21,12 +21,14 @@ const DEFAULT_ACCOUNT = process.env.DEMO_ACCOUNT ?? "amaka";
 export interface AgentServer {
   app: Express;
   db: Store;
-  client: CdpX402Client;
+  client: () => CdpX402Client;
 }
 
 export function createServer(): AgentServer {
   const db = openStore(process.env.AGENT_DB_PATH ?? "agent.sqlite", defaultRules);
-  const client: CdpX402Client = createPaymentClient();
+  // Built per request rather than held for the life of the process, so a
+  // long-running agent never presents a stale wallet credential.
+  const client = (): CdpX402Client => createPaymentClient();
 
   // One tick at a time. Two dashboard clicks in quick succession must not
   // become two payments.
@@ -91,7 +93,7 @@ export function createServer(): AgentServer {
     // pack, and the safe default when spending someone else's money is least.
     const pack: PackName = PACK_NAMES.includes(requested) ? requested : "small";
 
-    const run = approveFlagged(db, client, req.params.id, pack)
+    const run = approveFlagged(db, client(), req.params.id, pack)
       .then((result) => {
         if (result.blockedBy) {
           res.status(409).json({ error: "still blocked", blockedBy: result.blockedBy });
@@ -124,7 +126,7 @@ export function createServer(): AgentServer {
     }
 
     const account = typeof req.body?.account_id === "string" ? req.body.account_id : DEFAULT_ACCOUNT;
-    const run = runTick(db, client, account)
+    const run = runTick(db, client(), account)
       .then((result) => res.json(result))
       .catch((err: unknown) => {
         res.status(500).json({ error: err instanceof Error ? err.message : String(err) });

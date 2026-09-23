@@ -6,6 +6,7 @@ import { proposeDecision } from "./serv.js";
 import { summarizeUsage } from "./usage.js";
 import { getDecision, getRules, recordDecision, updateDecision, type Store } from "./store.js";
 import type { CdpX402Client } from "@coinbase/cdp-sdk/x402";
+import { createPaymentClient } from "./wallet.js";
 
 export interface TickResult {
   decision: Decision;
@@ -64,7 +65,13 @@ export async function runTick(
   const pack = proposal.pack as PackName;
 
   try {
-    const result = await payForPack(client, pack, account.id);
+    // A long-lived CdpX402Client has been seen to fail with a stale wallet
+    // authentication error, or a bare 402, while a freshly built one succeeds.
+    // One retry on a new client turns that into a non-event.
+    let result = await payForPack(client, pack, account.id);
+    if (!result.ok) {
+      result = await payForPack(createPaymentClient(), pack, account.id);
+    }
     if (!result.ok) {
       throw new Error(`recharge returned ${result.status}`);
     }

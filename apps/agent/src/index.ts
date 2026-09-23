@@ -22,7 +22,7 @@ app.listen(config.agentPort, () => {
 
 if (INTERVAL_SECONDS > 0) {
   setInterval(() => {
-    runTick(db, client, ACCOUNT).catch((err: unknown) => {
+    runTick(db, client(), ACCOUNT).catch((err: unknown) => {
       console.error("[tick]", err instanceof Error ? err.message : err);
     });
   }, INTERVAL_SECONDS * 1000);

@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { RulesForm } from "./components/RulesForm";
 import { StatStrip } from "./components/StatStrip";
+import { Timeline } from "./components/Timeline";
 import { WalletCard } from "./components/WalletCard";
 import { api } from "@/lib/api";
 import styles from "./page.module.css";
@@ -35,8 +36,10 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <hr className="rule" />
-      <p className={styles.placeholder}>Decision timeline lands in the next commit.</p>
+      <section className={styles.timeline}>
+        <div className="label">decisions</div>
+        <Timeline />
+      </section>
     </main>
   );
 }
