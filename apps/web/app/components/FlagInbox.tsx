@@ -9,6 +9,7 @@ import styles from "./FlagInbox.module.css";
 export function FlagInbox() {
   const queryClient = useQueryClient();
   const flags = useQuery({ queryKey: ["flags"], queryFn: api.flags, refetchInterval: 4000 });
+  const rules = useQuery({ queryKey: ["rules"], queryFn: api.rules });
   const [error, setError] = useState<string | null>(null);
 
   const refresh = () => {
@@ -58,17 +59,24 @@ export function FlagInbox() {
           </p>
 
           <div className={styles.controls}>
-            {PACK_NAMES.map((pack) => (
-              <button
-                key={pack}
-                className={styles.approve}
-                disabled={busy}
-                onClick={() => approve.mutate({ id: decision.id, pack })}
-              >
-                approve {pack}
-                <span className={styles.price}>${PACKS[pack].usdc.toFixed(2)}</span>
-              </button>
-            ))}
+            {PACK_NAMES.map((pack) => {
+              // A pack over the payer's per-recharge limit would be refused by
+              // the policy engine anyway, so do not offer it as a choice.
+              const overLimit =
+                rules.data !== undefined && PACKS[pack].usdc > rules.data.maxPerRechargeUsdc;
+              return (
+                <button
+                  key={pack}
+                  className={styles.approve}
+                  disabled={busy || overLimit}
+                  title={overLimit ? "over your per-recharge limit" : undefined}
+                  onClick={() => approve.mutate({ id: decision.id, pack })}
+                >
+                  approve {pack}
+                  <span className={styles.price}>${PACKS[pack].usdc.toFixed(2)}</span>
+                </button>
+              );
+            })}
             <button
               className={styles.reject}
               disabled={busy}

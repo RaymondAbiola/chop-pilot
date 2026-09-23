@@ -14,13 +14,17 @@ export function StatStrip({ account }: { account: string }) {
   });
 
   const wallet = useQuery({ queryKey: ["wallet"], queryFn: api.wallet, refetchInterval: 15_000 });
+  const rules = useQuery({ queryKey: ["rules"], queryFn: api.rules });
 
   const cutoff = Date.now() - WEEK_MS;
   const weekSpend = (state.data?.recharges ?? [])
     .filter((r) => new Date(r.created_at).getTime() >= cutoff)
     .reduce((sum, r) => sum + r.usdc, 0);
 
-  const cap = wallet.data?.spendControls.maxCumulativeUsdc;
+  // Meter against the payer's own weekly cap, not the SDK backstop. The
+  // payer's rule is lower and bites first, so showing the backstop here would
+  // overstate the headroom.
+  const cap = rules.data?.weeklyCapUsdc;
   const pct = cap ? Math.min(100, (weekSpend / cap) * 100) : 0;
 
   return (
@@ -35,7 +39,7 @@ export function StatStrip({ account }: { account: string }) {
       <Stat
         label="week spend"
         value={weekSpend.toFixed(2)}
-        unit={cap ? `of ${cap.toFixed(2)} cap` : ""}
+        unit={cap ? `of ${cap.toFixed(2)} your cap` : ""}
         meter={pct}
       />
     </section>
