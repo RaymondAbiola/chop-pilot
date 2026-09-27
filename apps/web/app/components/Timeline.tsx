@@ -31,7 +31,7 @@ const REASONS: Record<string, string> = {
 
 function explain(code: string): string {
   if (code.startsWith("payment_failed:")) {
-    return `payment failed — ${code.slice("payment_failed:".length)}`;
+    return `payment failed: ${code.slice("payment_failed:".length)}`;
   }
   return REASONS[code] ?? code;
 }

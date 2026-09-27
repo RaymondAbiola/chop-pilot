@@ -29,10 +29,10 @@ export function StatStrip({ account }: { account: string }) {
 
   return (
     <section className={styles.strip}>
-      <Stat label="balance" value={state.data ? `${state.data.chop_balance}` : "—"} unit="chops" />
+      <Stat label="balance" value={state.data ? `${state.data.chop_balance}` : "-"} unit="chops" />
       <Stat
         label="agent usdc"
-        value={wallet.data ? wallet.data.usdc.toFixed(2) : "—"}
+        value={wallet.data ? wallet.data.usdc.toFixed(2) : "-"}
         unit={wallet.isError ? "unreachable" : "available"}
         tone={wallet.data && wallet.data.usdc < 1 ? "warn" : undefined}
       />

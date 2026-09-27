@@ -172,7 +172,7 @@ function CopyButton({ value }: { value: string }) {
 }
 
 function truncate(value?: string): string {
-  if (!value) return "—";
+  if (!value) return "-";
   return value.startsWith("0x") && value.length > 20
     ? `${value.slice(0, 6)}…${value.slice(-4)}`
     : value;
