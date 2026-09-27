@@ -9,7 +9,7 @@ import styles from "./FlagInbox.module.css";
 export function FlagInbox() {
   const queryClient = useQueryClient();
   const flags = useQuery({ queryKey: ["flags"], queryFn: api.flags, refetchInterval: 4000 });
-  const rules = useQuery({ queryKey: ["rules"], queryFn: api.rules });
+  const rules = useQuery({ queryKey: ["rules"], queryFn: api.rules, refetchInterval: 15_000 });
   const [error, setError] = useState<string | null>(null);
 
   const refresh = () => {

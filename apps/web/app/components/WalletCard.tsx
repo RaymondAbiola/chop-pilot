@@ -14,7 +14,7 @@ const EXPLORER = "https://sepolia.basescan.org";
 
 export function WalletCard() {
   const wallet = useQuery({ queryKey: ["wallet"], queryFn: api.wallet, refetchInterval: 15_000 });
-  const rules = useRulesQuery({ queryKey: ["rules"], queryFn: api.rules });
+  const rules = useRulesQuery({ queryKey: ["rules"], queryFn: api.rules, refetchInterval: 15_000 });
   const { isConnected } = useAccount();
   const { connect, connectors } = useConnect();
   const [amount, setAmount] = useState("5");
@@ -34,10 +34,21 @@ export function WalletCard() {
   };
 
   if (wallet.isError) {
+    // The balance lookup goes agent -> CDP, so a failure here is usually the
+    // upstream call, not a dead agent. Say which, or debugging starts in the
+    // wrong place.
+    const message = (wallet.error as Error).message;
+    const upstream = /dns|network|fetch failed|502|timeout/i.test(message);
     return (
       <div className={styles.panel}>
         <div className="label">agent wallet</div>
-        <p className={styles.error}>Agent unreachable. Start it with pnpm dev:agent.</p>
+        <p className={styles.error}>
+          {upstream
+            ? "Cannot reach Coinbase to read the balance. Check your VPN or network."
+            : "Agent unreachable. Start it with pnpm dev:agent."}
+        </p>
+        <p className={styles.note}>{message}</p>
+        <p className={styles.note}>Retrying every 15 seconds.</p>
       </div>
     );
   }
@@ -109,14 +120,54 @@ function Row({ label, value, link }: { label: string; value?: string; link?: str
   return (
     <div className={styles.row}>
       <span className={styles.rowLabel}>{label}</span>
-      {link ? (
-        <a href={link} target="_blank" rel="noreferrer" className={`num ${styles.rowValue} ${styles.link}`}>
-          {truncate(value)}
-        </a>
-      ) : (
-        <span className={`num ${styles.rowValue}`}>{truncate(value)}</span>
-      )}
+      <span className={styles.rowRight}>
+        {link ? (
+          <a href={link} target="_blank" rel="noreferrer" className={`num ${styles.rowValue} ${styles.link}`}>
+            {truncate(value)}
+          </a>
+        ) : (
+          <span className={`num ${styles.rowValue}`}>{truncate(value)}</span>
+        )}
+        {value && value.startsWith("0x") ? <CopyButton value={value} /> : null}
+      </span>
     </div>
+  );
+}
+
+// Addresses are the one thing on this screen people need to paste elsewhere,
+// into a faucet, a wallet, or an explorer.
+function CopyButton({ value }: { value: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const copy = () => {
+    navigator.clipboard
+      .writeText(value)
+      .then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1400);
+      })
+      .catch(() => setCopied(false));
+  };
+
+  return (
+    <button
+      type="button"
+      className={styles.copy}
+      onClick={copy}
+      aria-label={copied ? "copied" : `copy ${value}`}
+      title={copied ? "copied" : "copy address"}
+    >
+      {copied ? (
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M3 8.5l3.2 3.2L13 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      ) : (
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <rect x="5.4" y="5.4" width="8.1" height="8.1" rx="1.5" stroke="currentColor" strokeWidth="1.3" />
+          <path d="M10.6 5.4V4a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 4v5.1A1.5 1.5 0 0 0 4 10.6h1.4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+        </svg>
+      )}
+    </button>
   );
 }
 

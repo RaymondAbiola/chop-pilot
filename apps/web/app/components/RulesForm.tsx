@@ -17,7 +17,7 @@ const FIELDS: { key: keyof Draft; label: string; hint: string; unit: string }[] 
 
 export function RulesForm() {
   const queryClient = useQueryClient();
-  const rules = useQuery({ queryKey: ["rules"], queryFn: api.rules });
+  const rules = useQuery({ queryKey: ["rules"], queryFn: api.rules, refetchInterval: 15_000 });
   const [draft, setDraft] = useState<Draft | null>(null);
 
   useEffect(() => {

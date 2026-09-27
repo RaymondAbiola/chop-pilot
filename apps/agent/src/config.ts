@@ -14,8 +14,8 @@ export const config = {
   // Deliberately generous relative to the payer's own rules: this is the floor
   // that holds even if the agent process is wrong about everything else.
   spend: {
-    maxPerPaymentUsdc: Number(process.env.SPEND_MAX_PER_PAYMENT_USDC ?? 0.5),
-    maxCumulativeUsdc: Number(process.env.SPEND_MAX_CUMULATIVE_USDC ?? 5),
+    maxPerPaymentUsdc: Number(process.env.SPEND_MAX_PER_PAYMENT_USDC ?? 15),
+    maxCumulativeUsdc: Number(process.env.SPEND_MAX_CUMULATIVE_USDC ?? 40),
     window: process.env.SPEND_WINDOW ?? "7d",
   },
 } as const;
@@ -23,8 +23,8 @@ export const config = {
 // Starting rules. The dashboard will let the payer change these in commit 12;
 // until then they are the demo defaults.
 export const defaultRules = {
-  weeklyCapUsdc: Number(process.env.RULE_WEEKLY_CAP_USDC ?? 3),
-  maxPerRechargeUsdc: Number(process.env.RULE_MAX_PER_RECHARGE_USDC ?? 0.5),
+  weeklyCapUsdc: Number(process.env.RULE_WEEKLY_CAP_USDC ?? 20),
+  maxPerRechargeUsdc: Number(process.env.RULE_MAX_PER_RECHARGE_USDC ?? 15),
   minBalanceTrigger: Number(process.env.RULE_MIN_BALANCE_TRIGGER ?? 10),
   cooldownMinutes: Number(process.env.RULE_COOLDOWN_MINUTES ?? 60),
   recipientAllowlist: [requireEnv("MERCHANT_ADDRESS")],

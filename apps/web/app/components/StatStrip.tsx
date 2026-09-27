@@ -14,7 +14,7 @@ export function StatStrip({ account }: { account: string }) {
   });
 
   const wallet = useQuery({ queryKey: ["wallet"], queryFn: api.wallet, refetchInterval: 15_000 });
-  const rules = useQuery({ queryKey: ["rules"], queryFn: api.rules });
+  const rules = useQuery({ queryKey: ["rules"], queryFn: api.rules, refetchInterval: 15_000 });
 
   const cutoff = Date.now() - WEEK_MS;
   const weekSpend = (state.data?.recharges ?? [])

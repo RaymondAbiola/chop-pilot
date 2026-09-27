@@ -8,8 +8,8 @@ const MERCHANT = "0x1Ef0E1De9F0ac2255a42e8987692f89F296dd670";
 const NOW = new Date("2026-09-23T12:00:00.000Z");
 
 const rules: Rules = {
-  weeklyCapUsdc: 3,
-  maxPerRechargeUsdc: 0.5,
+  weeklyCapUsdc: 20,
+  maxPerRechargeUsdc: 15,
   minBalanceTrigger: 10,
   cooldownMinutes: 60,
   recipientAllowlist: [MERCHANT],
@@ -70,7 +70,7 @@ describe("evaluate", () => {
 
   it("blocks a pack that costs more than the per-recharge limit", () => {
     const verdict = evaluate(recharge({ pack: "large" }), ctx({
-      rules: { ...rules, maxPerRechargeUsdc: 0.25 },
+      rules: { ...rules, maxPerRechargeUsdc: 7.5 },
     }));
     expect(verdict.blockedBy).toContain(BlockReason.MAX_PER_RECHARGE);
   });
@@ -78,8 +78,8 @@ describe("evaluate", () => {
   it("blocks when the week's spending would exceed the cap", () => {
     const verdict = evaluate(recharge(), ctx({
       recharges: [
-        { usdc: 1.5, created_at: daysAgo(1) },
-        { usdc: 1.4, created_at: daysAgo(2) },
+        { usdc: 8, created_at: daysAgo(1) },
+        { usdc: 7, created_at: daysAgo(2) },
       ],
     }));
     expect(verdict.blockedBy).toContain(BlockReason.WEEKLY_CAP);
@@ -87,7 +87,7 @@ describe("evaluate", () => {
 
   it("ignores spending that fell outside the 7 day window", () => {
     const verdict = evaluate(recharge(), ctx({
-      recharges: [{ usdc: 2.9, created_at: daysAgo(8) }],
+      recharges: [{ usdc: 19, created_at: daysAgo(8) }],
     }));
     expect(verdict.blockedBy).not.toContain(BlockReason.WEEKLY_CAP);
   });
@@ -119,14 +119,14 @@ describe("evaluate", () => {
 
   it("blocks inside the cooldown window", () => {
     const verdict = evaluate(recharge(), ctx({
-      recharges: [{ usdc: 0.25, created_at: minutesAgo(30) }],
+      recharges: [{ usdc: 7.5, created_at: minutesAgo(30) }],
     }));
     expect(verdict.blockedBy).toContain(BlockReason.COOLDOWN);
   });
 
   it("allows once the cooldown has passed", () => {
     const verdict = evaluate(recharge(), ctx({
-      recharges: [{ usdc: 0.25, created_at: minutesAgo(90) }],
+      recharges: [{ usdc: 7.5, created_at: minutesAgo(90) }],
     }));
     expect(verdict.blockedBy).not.toContain(BlockReason.COOLDOWN);
   });
@@ -135,8 +135,8 @@ describe("evaluate", () => {
     const verdict = evaluate(recharge({ pack: "large", anomaly: true }), ctx({
       balance: 40,
       payee: "0xdeadbeef00000000000000000000000000000000",
-      rules: { ...rules, maxPerRechargeUsdc: 0.25 },
-      recharges: [{ usdc: 2.9, created_at: minutesAgo(10) }],
+      rules: { ...rules, maxPerRechargeUsdc: 7.5 },
+      recharges: [{ usdc: 19, created_at: minutesAgo(10) }],
     }));
     expect(verdict.approved).toBe(false);
     expect(verdict.blockedBy).toEqual([
@@ -154,13 +154,13 @@ describe("spentInWindow", () => {
   it("sums only what falls inside the window", () => {
     const spent = spentInWindow(
       [
-        { usdc: 0.5, created_at: daysAgo(1) },
-        { usdc: 0.25, created_at: daysAgo(6) },
-        { usdc: 10, created_at: daysAgo(30) },
+        { usdc: 2.5, created_at: daysAgo(1) },
+        { usdc: 7.5, created_at: daysAgo(6) },
+        { usdc: 100, created_at: daysAgo(30) },
       ],
       NOW,
     );
-    expect(spent).toBe(0.75);
+    expect(spent).toBe(10);
   });
 
   it("is zero with no history", () => {
@@ -183,7 +183,7 @@ describe("waiveAnomaly", () => {
       recharge({ anomaly: true }),
       ctx({
         usage: usage(ANOMALY_THRESHOLD + 2),
-        recharges: [{ usdc: 2.9, created_at: daysAgo(1) }],
+        recharges: [{ usdc: 19, created_at: daysAgo(1) }],
       }),
       { waiveAnomaly: true },
     );

@@ -17,12 +17,12 @@
 }
 
 .clock {
-  font-size: 12px;
+  font-size: 13.5px;
   color: var(--muted);
 }
 
 .status {
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -32,14 +32,14 @@
 }
 
 .pack {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--muted);
   border: 1px solid var(--hairline-strong);
   padding: 1px 7px;
 }
 
 .ago {
-  font-size: 10.5px;
+  font-size: 12px;
   color: var(--dim);
   font-family: var(--mono);
 }
@@ -52,7 +52,7 @@
 
 .rowLabel {
   font-family: var(--mono);
-  font-size: 10px;
+  font-size: 11.5px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--dim);
@@ -62,14 +62,14 @@
 }
 
 .reasoning {
-  font-size: 13px;
+  font-size: 15px;
   line-height: 1.55;
   color: var(--text);
   max-width: 62ch;
 }
 
 .verdict {
-  font-size: 12px;
+  font-size: 13.5px;
   line-height: 1.55;
 }
 
@@ -88,7 +88,7 @@
 
 .cross {
   font-family: var(--mono);
-  font-size: 10px;
+  font-size: 11.5px;
 }
 
 .muted {
@@ -96,7 +96,7 @@
 }
 
 .tx {
-  font-size: 12px;
+  font-size: 13.5px;
   color: var(--amber);
   text-decoration: none;
 }
@@ -115,7 +115,7 @@
 .empty {
   color: var(--dim);
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 13.5px;
   padding: 28px 0;
 }
 

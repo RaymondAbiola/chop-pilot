@@ -3,13 +3,15 @@ export const NETWORK = "eip155:84532" as const;
 
 export const FACILITATOR_URL = "https://x402.org/facilitator";
 
-export const CHOP_PRICE_USDC = 0.01;
+export const CHOP_PRICE_USDC = 0.5;
 
 // x402 prices a route, not a request, so recharges are fixed packs.
+// Sized against real consumption: roughly two to three meals a day, so medium
+// is about a week. Prices follow CHOP_PRICE_USDC exactly.
 export const PACKS = {
-  small: { chops: 10, usdc: 0.1 },
-  medium: { chops: 25, usdc: 0.25 },
-  large: { chops: 50, usdc: 0.5 },
+  small: { chops: 5, usdc: 2.5 },
+  medium: { chops: 15, usdc: 7.5 },
+  large: { chops: 30, usdc: 15 },
 } as const;
 
 export type PackName = keyof typeof PACKS;
