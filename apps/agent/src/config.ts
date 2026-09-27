@@ -7,7 +7,9 @@ loadRootEnv(import.meta.url);
 
 export const config = {
   merchantAddress: requireEnv("MERCHANT_ADDRESS"),
-  mockUrl: process.env.CHOPEAZY_MOCK_URL ?? "http://localhost:4000",
+  // A trailing slash from a host dashboard turns every request path into a
+  // double slash, which Express will not match.
+  mockUrl: (process.env.CHOPEAZY_MOCK_URL ?? "http://localhost:4000").replace(/\/+$/, ""),
   // Hosts such as Render inject PORT and expect the service to bind it.
   agentPort: Number(process.env.PORT ?? process.env.AGENT_PORT ?? 4100),
 
