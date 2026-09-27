@@ -37,11 +37,21 @@ export function seed(db: DB): void {
     new Date(now - MANUAL_TOP_UP_DAYS_AGO * 86_400_000).toISOString(),
   );
 
+  // Anchor to UTC midnight. Offsetting from "now" pushed meals across the date
+  // boundary depending on the hour, which put yesterday's meals on today and
+  // made the demo look like a spike.
+  const midnightToday = Date.UTC(
+    new Date(now).getUTCFullYear(),
+    new Date(now).getUTCMonth(),
+    new Date(now).getUTCDate(),
+  );
+
   DAILY_PATTERN.forEach((meals, i) => {
     const daysAgo = DAILY_PATTERN.length - i;
+    const dayStart = midnightToday - daysAgo * 86_400_000;
     for (let meal = 0; meal < meals; meal++) {
-      // Spread meals across the day so the sparkline is not a flat stack.
-      const at = new Date(now - daysAgo * 86_400_000 + (8 + meal * 5) * 3_600_000);
+      // Spread meals across that day, staying inside it.
+      const at = new Date(dayStart + (8 + meal * 4) * 3_600_000);
       insert.run(DEMO_ACCOUNT.id, 1, at.toISOString());
     }
   });
