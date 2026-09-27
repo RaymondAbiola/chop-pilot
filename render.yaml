@@ -5,7 +5,7 @@ services:
     name: choppilot-mock
     runtime: node
     plan: free
-    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm --filter @choppilot/shared build && pnpm --filter @choppilot/chopeazy-mock build
+    buildCommand: corepack pnpm install --frozen-lockfile && corepack pnpm --filter @choppilot/shared build && corepack pnpm --filter @choppilot/chopeazy-mock build
     startCommand: node apps/chopeazy-mock/dist/index.js
     healthCheckPath: /health
     envVars:
@@ -20,7 +20,7 @@ services:
     name: choppilot-agent
     runtime: node
     plan: free
-    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm --filter @choppilot/shared build && pnpm --filter @choppilot/agent build
+    buildCommand: corepack pnpm install --frozen-lockfile && corepack pnpm --filter @choppilot/shared build && corepack pnpm --filter @choppilot/agent build
     startCommand: node apps/agent/dist/index.js
     healthCheckPath: /health
     envVars:
