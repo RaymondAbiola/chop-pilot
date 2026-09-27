@@ -8,7 +8,8 @@ loadRootEnv(import.meta.url);
 export const config = {
   merchantAddress: requireEnv("MERCHANT_ADDRESS"),
   mockUrl: process.env.CHOPEAZY_MOCK_URL ?? "http://localhost:4000",
-  agentPort: Number(process.env.AGENT_PORT ?? 4100),
+  // Hosts such as Render inject PORT and expect the service to bind it.
+  agentPort: Number(process.env.PORT ?? process.env.AGENT_PORT ?? 4100),
 
   // Hard ceilings enforced by the CDP SDK itself, underneath the policy engine.
   // Deliberately generous relative to the payer's own rules: this is the floor

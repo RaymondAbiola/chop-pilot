@@ -1,0 +1,50 @@
+# Render blueprint. Both Node services build from the repo root so the shared
+# workspace package is available, then run their own compiled entrypoint.
+services:
+  - type: web
+    name: choppilot-mock
+    runtime: node
+    plan: free
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm --filter @choppilot/shared build && pnpm --filter @choppilot/chopeazy-mock build
+    startCommand: node apps/chopeazy-mock/dist/index.js
+    healthCheckPath: /health
+    envVars:
+      - key: DB_PATH
+        value: /tmp/chopeazy.sqlite
+      - key: FACILITATOR_URL
+        value: https://x402.org/facilitator
+      - key: MERCHANT_ADDRESS
+        sync: false
+
+  - type: web
+    name: choppilot-agent
+    runtime: node
+    plan: free
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm --filter @choppilot/shared build && pnpm --filter @choppilot/agent build
+    startCommand: node apps/agent/dist/index.js
+    healthCheckPath: /health
+    envVars:
+      - key: AGENT_DB_PATH
+        value: /tmp/agent.sqlite
+      - key: SERV_MODEL
+        value: gpt-5.6-luna
+      - key: SPEND_MAX_PER_PAYMENT_USDC
+        value: "15"
+      - key: SPEND_MAX_CUMULATIVE_USDC
+        value: "40"
+      - key: RULE_WEEKLY_CAP_USDC
+        value: "20"
+      - key: RULE_MAX_PER_RECHARGE_USDC
+        value: "15"
+      - key: SERV_API_KEY
+        sync: false
+      - key: CDP_API_KEY_ID
+        sync: false
+      - key: CDP_API_KEY_SECRET
+        sync: false
+      - key: CDP_WALLET_SECRET
+        sync: false
+      - key: MERCHANT_ADDRESS
+        sync: false
+      - key: CHOPEAZY_MOCK_URL
+        sync: false

@@ -23,7 +23,8 @@ try {
   // No .env yet. Defaults below cover local development.
 }
 
-const PORT = Number(process.env.MOCK_PORT ?? 4000);
+// Hosts such as Render inject PORT and expect the service to bind it.
+const PORT = Number(process.env.PORT ?? process.env.MOCK_PORT ?? 4000);
 const HISTORY_DAYS = 14;
 
 const db = openDb(process.env.DB_PATH ?? "chopeazy.sqlite");
