@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="ChopPilot">
+  <rect width="512" height="512" rx="96" fill="#0C0D0E"/>
+
+  <!-- autopilot chevron: the agent steering -->
+  <path d="M256 96 L312 152 L288 152 L256 120 L224 152 L200 152 Z" fill="#E8A33D"/>
+
+  <!-- consumption bars: the balance being metered -->
+  <g fill="#E8A33D">
+    <rect x="188" y="266" width="26" height="54" rx="6"/>
+    <rect x="230" y="238" width="26" height="82" rx="6"/>
+    <rect x="272" y="212" width="26" height="108" rx="6"/>
+  </g>
+
+  <!-- bowl: the meal balance holding them -->
+  <path d="M132 320 H380 A124 124 0 0 1 132 320 Z" fill="none" stroke="#E8E6E3" stroke-width="22" stroke-linejoin="round"/>
+  <line x1="112" y1="320" x2="400" y2="320" stroke="#E8E6E3" stroke-width="22" stroke-linecap="round"/>
+</svg>
